@@ -1,0 +1,6 @@
+[submodule "t3-cicd-cli"]
+	path = t3-cicd-cli
+	url = https://github.com/CS6510-SEA-F24/t3-cicd-cli.git
+[submodule "t3-cicd-backend"]
+	path = t3-cicd-backend
+	url = https://github.com/CS6510-SEA-F24/t3-cicd-backend.git
