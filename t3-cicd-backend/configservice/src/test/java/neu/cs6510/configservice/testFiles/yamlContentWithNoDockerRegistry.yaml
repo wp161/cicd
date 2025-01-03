@@ -1,0 +1,19 @@
+stages:
+  - build
+  - test
+
+default:
+  name: pipeline
+  docker:
+    name: Java17
+  
+    
+build:
+  stage: build
+  script: 
+    - echo "Building"
+  
+test:
+  stage: test
+  script: 
+    - echo "Testing"

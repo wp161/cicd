@@ -1,0 +1,75 @@
+stages:
+  - build
+  - test
+  - documentation
+  - deploy
+  - ab
+
+image:
+  name: gradle:8.7
+
+compile:
+  stage: 
+  needs: ["validation"]
+  script:
+    - echo "Compile application"
+    # - gradle classes
+  artifacts:  
+    when: on_success
+    access: all
+    expire_in: "30 days"
+    paths:
+      - app/build/classes/*
+
+comp:
+
+validation:
+  stage: build
+  script:
+    - echo "Running validations"
+    - gradle checkstyleMain checkstyleTest spotbugsMain
+  artifacts:
+    when: on_success
+    access: all
+    expire_in: "30 days"
+    paths:
+      - app/build/reports/*
+
+testing:
+  stage: test
+  script:
+    - echo "Running unit tests... "
+    - gradle test jacocoTestReport
+  artifacts:
+    when: on_success
+    access: all
+    expire_in: "30 days"
+    paths:
+      - app/build/reports/*
+
+javadoc:
+  stage: documentation
+  script:
+    - echo "Generate Javadocs"
+    - gradle javadoc
+  artifacts:
+
+    when: on_success
+    access: all
+    expire_in: "30 days"
+    paths:
+      - app/build/docs/*
+
+distribution: 
+  stage: deploy
+  script:
+    - echo "Create distribution"
+    - gradle assembleDist
+  artifacts:
+    when: on_success
+    access: all
+    expire_in: "30 days"
+    paths:
+      - app/build/distributions/*
+      - app/build/docs/*
+      - app/build/reports/*

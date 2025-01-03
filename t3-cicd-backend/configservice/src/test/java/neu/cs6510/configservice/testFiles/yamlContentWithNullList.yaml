@@ -1,0 +1,24 @@
+stages:
+  - build
+  - test
+
+default:
+  name: pipeline
+  docker:
+    registry: docker.io
+    image: openjdk:17-jdk-slim
+  paths:
+    - app/build/reports/*
+  
+    
+build:
+  stage: build
+  script:
+  docker:
+    registry: dockerhub.io
+    image: openjdk:21-jdk-slim
+  
+test:
+  stage: test
+  script: 
+    - echo "Testing"

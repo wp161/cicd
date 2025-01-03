@@ -1,0 +1,41 @@
+name: PR Size Check
+
+on:
+  pull_request:
+    types:
+      - opened # Trigger on new pull request
+      - ready_for_review
+      - synchronize    # Trigger when new commits are pushed to the PR
+
+
+# PR Size Check Job
+jobs:
+  pr-size-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Fetch PR details
+        run: |
+          PR_LINES=$(git diff --stat origin/main \
+          | grep -v .lock \
+          | grep -v Bin \
+          | awk -F"|" '{ print $2 }' \
+          | awk '{ print $1 }' \
+          | sed '/^$/d' \
+          | paste -sd+ - \
+          | bc)
+          echo "PR_LINES=$PR_LINES" >> $GITHUB_ENV
+
+      - name: Fail if PR exceeds 150 lines and no override
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'override-size-limit') }}
+        run: |
+         if [[ $PR_LINES -gt 150 ]]; then
+           echo "PR exceeds 150 lines. Please submit a smaller PR, or add a label 'override-size-limit' to the PR to override."
+           exit 1 
+         else 
+           echo "PR size is within limit or override is enabled." 
+         fi

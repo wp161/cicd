@@ -1,0 +1,21 @@
+name: Assign Reviewer
+
+on:
+  pull_request:
+    types:
+      - opened # Trigger on new pull request
+      - ready_for_review
+
+jobs:
+  # Reviewer assignment job (Round-Robin)
+  reviewer-lottery:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🎲 The Blame Game (Reviewer Edition) 🎲
+        uses: uesteibar/reviewer-lottery@v3.1.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,8 @@
+groups:
+  - name: t3
+    reviewers: 2
+    internal_reviewers: 2
+    usernames:
+      - wp161
+      - thekelvinlime
+      - yuhangot

@@ -1,0 +1,23 @@
+        stages:
+         - build
+         - test
+        
+        default:
+          name: pipeline
+          docker:
+            registry: docker.io
+            image: openjdk:17-jdk-slim
+          
+            
+        build:
+          stage: build
+          script: 
+            - echo "Building"
+          artifacts:
+            paths:
+              - app/build/classes/*
+          
+        test:
+          stage: test
+          script: 
+            - echo "Testing"

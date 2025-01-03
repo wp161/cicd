@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-controller-local
+  namespace: t3cicdbackend
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+spec:
+  ingressClassName: nginx # Ensure this matches your Ingress Controller in `kubectl get ingressclass`
+  defaultBackend:
+    service:
+      name: configservice
+      port:
+        number: 8080
+  rules:
+    - host: localhost # uses localhost that can be automatically resolved as 127.0.0.1
+      http:
+        paths:
+          - path: /validate
+            pathType: Prefix
+            backend:
+              service:
+                name: configservice
+                port:
+                  number: 8080
+          - path: /pipeline/run
+            pathType: Prefix
+            backend:
+              service:
+                name: pipelineservice
+                port:
+                  number: 8080

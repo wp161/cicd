@@ -1,0 +1,29 @@
+stages:
+  - build
+  - test
+
+default:
+  name: pipeline
+
+checkout:
+  stage: build
+  docker:
+    registry: docker.io
+    image: ubuntu:latest
+  script: 
+    - echo "Checkout"
+build:
+  stage: build
+  docker:
+    registry: docker.io
+    image: openjdk:17-jdk-slim
+  needs: ["checkout"]
+  script: 
+    - echo "Building"
+test:
+  stage: test
+  docker:
+    registry: docker.io
+    image: python:latest
+  script: 
+    - echo "Testing"

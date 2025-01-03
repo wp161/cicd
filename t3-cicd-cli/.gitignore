@@ -1,0 +1,38 @@
+# Ignore IDEs and editors
+.idea/
+.vscode/
+
+# Ignore Python compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+
+# Ignore dist folder for builds
+dist/
+
+# Ignore virtual environment and nox virtual environment
+.venv/
+.nox/
+ENV/
+venv/
+
+# Ignore coverage reports
+htmlcov/
+.coverage
+.cache
+*.cover
+*.py.cover
+reports/
+
+# Ignore logs
+*.log
+
+# Ignore Mac OS files
+.DS_Store
+
+# Ignore documentation
+docs/
+
+# Ignore test Config files
+.cicd-pipelines/

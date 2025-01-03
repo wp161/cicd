@@ -1,0 +1,56 @@
+[build-system]
+requires = ["poetry-core==1.8.3"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "t3-cicd-cli"           
+version = "0.1.0"        
+description = "A Python CLI for CI/CD pipelines"   
+authors = [
+  "Kelvin Lim <lim.kel@northeastern.edu>",
+  "Wenbo Pan <pan.web@northeastern.edu>",
+  "Yuanyuan Wu <wu.yuanyu@northeastern.edu>",
+  "Yuhan Meng <meng.yuha@northeastern.edu>"
+]
+
+packages = [
+  { include = "t3_cicd_cli", from = "src" }
+]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"                     
+click = "^8.1.7"               # CLI framework for building command-line interfaces
+PyYAML = "^6.0"
+requests = "^2.26"
+GitPython = "^3.1.24"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.2.2"               # Pytest Test
+pytest-cov = "^4.0.0"           # Pytest coverage plugin to check code coverage
+flake8 = "^6.0.0"               # Flake8 Checkstyle (PEP8)
+black = "^24.8.0"               # Black automatic code formatting
+
+[tool.poetry.group.dev.dependencies]
+nox = "^2024.4.15"
+pdoc = "^15.0.0"
+pytest-html = "^4.1.1"
+
+[tool.poetry.scripts]
+cicd = "t3_cicd_cli.cli:cli"
+
+[tool.pytest.ini_options]
+testpaths = [
+  "tests"
+]
+pythonpath = ["src"]
+

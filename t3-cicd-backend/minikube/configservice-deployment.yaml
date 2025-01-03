@@ -1,0 +1,103 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: manual
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: git-repo-pv
+  labels:
+    app: configservice
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/git-repo/"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: git-repo-pvc
+  labels:
+    app: configservice
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configservice
+  namespace: t3cicdbackend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configservice
+  template:
+    metadata:
+      labels:
+        app: configservice
+    spec:
+      containers:
+        - name: configservice
+          image: t3cicdbackend-configservice:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres.t3cicdbackend-datastore.svc.cluster.local:5432/mydb"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-root-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-root-password
+          volumeMounts:
+            - mountPath: /mnt/git-repo/
+              name: git-repo
+      volumes:
+        - name: git-repo
+          persistentVolumeClaim:
+            claimName: git-repo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configservice
+  namespace: t3cicdbackend
+spec:
+  selector:
+    app: configservice
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: NodePort
+---
+apiVersion: multicluster.x-k8s.io/v1alpha1
+kind: ServiceImport
+metadata:
+  name: postgres
+  namespace: t3cicdbackend
+spec:
+  type: ClusterSetIP
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432

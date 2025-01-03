@@ -1,0 +1,72 @@
+stages:
+  - build
+  - test
+  
+default:
+  name: pipeline
+  docker:
+    registry: docker.io
+    image: openjdk:17-jdk-slim
+  
+checkout:
+  stage: build
+  script: 
+    - echo "Checkout"
+    - sleep 10
+    - echo "Finish Checkout"
+build:
+  stage: build
+  needs: ["checkout"]
+  script: 
+    # - cd code
+    - echo "Building"
+    # - ./gradlew clean build
+    - sleep 10
+    - echo "Finish Building"
+test_a:
+  stage: test
+  script: 
+    - echo "Testing A"
+    - sleep 10
+    - echo "Finish Testing A"
+test_b:
+  stage: test
+  needs: ["test_a"]
+  script: 
+    - echo "Testing B"
+    - sleep 10
+    - echo "Finish Testing B"
+test_c:
+  stage: test
+  needs: ["test_b"]
+  script:
+    - echo "Testing C"
+    - sleep 10
+    - echo "Finish Testing C"
+test_d:
+  stage: test
+  script:
+    - echo "Testing D"
+    - sleep 10
+    - echo "Finish Testing D"
+test_e:
+  stage: test
+  needs: ["test_b", "test_d"]
+  script:
+    - echo "Testing E"
+    - sleep 10
+    - echo "Finish Testing E"
+test_f:
+  stage: test
+  script:
+    - echo "Testing E"
+    - sleep 10
+    - echo "Finish Testing F"
+test_g:
+  stage: test
+  needs: ["test_f"]
+  script:
+    - echo "Testing E"
+    - sleep 10
+    - echo "Finish Testing G"
+  

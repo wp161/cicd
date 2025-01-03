@@ -1,0 +1,115 @@
+name: Pipeline Run
+
+on:
+  pull_request:
+    types:
+      - opened # Trigger on new pull request
+      - ready_for_review
+      - synchronize    # Trigger when new commits are pushed to the PR
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build and test subprojects
+        run: |
+          ./gradlew :shared:assemble test
+          ./gradlew :shared:checkstyleMain checkstyleTest spotbugsMain spotbugsTest
+          ./gradlew :shared:jacocoTestReport
+          ./gradlew :configservice:checkstyleMain checkstyleTest spotbugsMain spotbugsTest
+          ./gradlew :configservice:jacocoTestReport
+          ./gradlew :pipelineservice:checkstyleMain checkstyleTest spotbugsMain spotbugsTest
+          ./gradlew :pipelineservice:jacocoTestReport
+
+      - name: Upload shared JAR file
+        uses: actions/upload-artifact@v3
+        with:
+          name: shared-jar
+          path: shared/build/libs/*.jar
+
+      - name: Upload configservice JAR file
+        uses: actions/upload-artifact@v3
+        with:
+          name: configservice-jar
+          path: configservice/build/libs/*.jar
+
+      - name: Upload pipelineservice JAR file
+        uses: actions/upload-artifact@v3
+        with:
+          name: pipelineservice-jar
+          path: pipelineservice/build/libs/*.jar
+
+      - name: Upload shared test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: shared-test-results
+          path: shared/build/reports/tests/test
+
+      - name: Upload shared JaCoCo test coverage report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: shared-jacoco-coverage-report
+          path: shared/build/reports/jacoco/test/html
+
+      - name: Upload shared Javadoc
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: shared-javadoc
+          path: shared/build/docs/javadoc
+
+      - name: Upload configservice test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: configservice-test-results
+          path: configservice/build/reports/tests/test
+
+      - name: Upload configservice JaCoCo test coverage report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: configservice-jacoco-coverage-report
+          path: configservice/build/reports/jacoco/test/html
+
+      - name: Upload configservice Javadoc
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: configservice-javadoc
+          path: configservice/build/docs/javadoc
+
+      - name: Upload pipelineservice test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: pipelineservice-test-results
+          path: pipelineservice/build/reports/tests/test
+
+      - name: Upload pipelineservice JaCoCo test coverage report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: pipelineservice-jacoco-coverage-report
+          path: pipelineservice/build/reports/jacoco/test/html
+
+      - name: Upload pipelineservice Javadoc
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: pipelineservice-javadoc
+          path: pipelineservice/build/docs/javadoc
